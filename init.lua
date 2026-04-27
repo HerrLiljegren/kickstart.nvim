@@ -612,6 +612,16 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
 
+        roslyn_ls = { -- C#/.NET code navigation via Roslyn
+          cmd = {
+            vim.fn.expand '~/.local/share/roslyn-language-server/5.4.0-2.26179.14/content/LanguageServer/linux-x64/Microsoft.CodeAnalysis.LanguageServer',
+            '--logLevel',
+            'Information',
+            '--extensionLogDirectory',
+            vim.fs.joinpath(vim.uv.os_tmpdir(), 'roslyn_ls/logs'),
+            '--stdio',
+          },
+        },
         stylua = {}, -- Used to format Lua code
 
         -- Special Lua Config, as recommended by neovim help docs
@@ -657,6 +667,8 @@ require('lazy').setup({
       --
       -- You can press `g?` for help in this menu.
       local ensure_installed = vim.tbl_keys(servers or {})
+      -- roslyn_ls is an nvim-lspconfig server, but it is not provided by Mason's registry.
+      ensure_installed = vim.tbl_filter(function(server) return server ~= 'roslyn_ls' end, ensure_installed)
       vim.list_extend(ensure_installed, {
         -- You can add other tools here that you want Mason to install
       })
@@ -920,7 +932,7 @@ require('lazy').setup({
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter-intro`
     config = function()
       -- ensure basic parser are installed
-      local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+      local parsers = { 'bash', 'c', 'c_sharp', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
       require('nvim-treesitter').install(parsers)
 
       ---@param buf integer
@@ -982,7 +994,9 @@ require('lazy').setup({
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.lazygit',
+  require 'kickstart.plugins.project-picker',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommended keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
